@@ -28,7 +28,7 @@ namespace WebApi
             services.AddResponseCompression();
             services.AddDbContext<TimeLineDbContext>(opt => {
                 var sqlConnectionString = config.GetConnectionString("Default");
-                opt.UseNpgsql(sqlConnectionString, o => o.MigrationsAssembly("TimeLine.Infrastructure"));
+                opt.UseNpgsql(sqlConnectionString, o => o.MigrationsAssembly("Infrastructure"));
             });
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IAuthorizationService, AuthorizationService>();
@@ -58,6 +58,7 @@ namespace WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                
             }
             app.UseSwagger();
             app.UseSwaggerUI(c =>

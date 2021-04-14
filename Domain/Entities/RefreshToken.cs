@@ -9,7 +9,7 @@ namespace Domain.Entities
         public DateTime IssuedUtc { get; set; }
         public DateTime ExpiresUtc { get; set; }
         public string Token { get; set; }
-        public string UserId { get; set; }
+        public long UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public ApplicationUser User { get; set; }
     }

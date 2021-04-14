@@ -8,6 +8,8 @@ namespace Infrastructure.DataBaseContext
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Settings> Settings { get; set; }
+        public DbSet<ApplicationTask> ApplicationTasks { get; set; }
         public TimeLineDbContext(DbContextOptions<TimeLineDbContext> options) : base(options) { }
         public void InsertNew(RefreshToken token)
         {
