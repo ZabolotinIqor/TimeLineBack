@@ -2,15 +2,18 @@ using System.Text;
 using Application.ApplicationUser;
 using Application.Authorization;
 using Application.Token;
+using Domain.Entities;
 using Infrastructure.DataBaseContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+
 
 namespace WebApi
 {
@@ -30,10 +33,27 @@ namespace WebApi
                 var sqlConnectionString = config.GetConnectionString("Default");
                 opt.UseNpgsql(sqlConnectionString, o => o.MigrationsAssembly("Infrastructure"));
             });
-            services.AddTransient<ITokenService, TokenService>();
-            services.AddTransient<IAuthorizationService, AuthorizationService>();
-            services.AddTransient<IApplicationUserService, ApplicationUserService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IAuthorizationService, AuthorizationService>();
+            services.AddScoped<IApplicationUserService, ApplicationUserService>();
             services.AddSwaggerGen();
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin();
+            }));
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                {
+                    options.Password.RequireDigit = true;
+                    options.Password.RequiredLength = 8;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireLowercase = true;
+                    options.User.RequireUniqueEmail = true;
+                })
+                .AddEntityFrameworkStores<TimeLineDbContext>();
+
             services.AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -60,6 +80,7 @@ namespace WebApi
                 app.UseDeveloperExceptionPage();
                 
             }
+            app.UseCors("MyPolicy");
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

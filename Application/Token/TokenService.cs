@@ -6,7 +6,7 @@ using System.Text;
 using Domain.Common;
 using Domain.Entities;
 using Infrastructure.DataBaseContext;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
@@ -15,9 +15,9 @@ namespace Application.Token
 {
     public class TokenService: ITokenService
     {
-        private readonly IOptions<JwtConfig> config;
+        private readonly IConfiguration config;
         private readonly TimeLineDbContext context;
-        public TokenService(IOptions<JwtConfig> config, TimeLineDbContext context)
+        public TokenService(IConfiguration config, TimeLineDbContext context)
         {
             this.config = config;
             this.context = context;
@@ -28,23 +28,23 @@ namespace Application.Token
 
                  var claims = new List<Claim>()
                  {
-                     new Claim(JwtRegisteredClaimNames.NameId, user.id.ToString()),
-                     new Claim(JwtRegisteredClaimNames.Jti, user.id.ToString()),
+                     new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+                     new Claim(JwtRegisteredClaimNames.Jti, user.Id),
                      new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(now).ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
-                     new Claim(JwtRegisteredClaimNames.Birthdate, user.birthDate),
+                     new Claim(JwtRegisteredClaimNames.PhoneNumber, user.PhoneNumber),
                  };
 
-                 var expiration = TimeSpan.FromMinutes(Convert.ToInt32(config.Value.JwtExpires));
-                 var issuer = config.Value.JwtIssuer;
-                 var audience = config.Value.JwtAudience;
-                 var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.Value.JwtKey));
+                 var expiration = TimeSpan.FromMinutes(Convert.ToInt32(config["JwtExpires"]));
+                 var issuer = config["JwtIssuer"];
+                 var audience = config["JwtAudience"];
+                 var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config["JwtKey"]));
                  var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                  if (refreshToken == null)
                  {
                      refreshToken = new RefreshToken()
                      {
-                         UserId = user.id,
+                         UserId = user.Id,
                          Token = Guid.NewGuid().ToString("N"),
                      };
                      context.InsertNew(refreshToken);
@@ -68,9 +68,7 @@ namespace Application.Token
                      accessToken = encodedJwt,
                      refreshToken = refreshToken.Token,
                      expiresIn = (int)expiration.TotalSeconds,
-                     userId = user.id,
-                     role = user.role,
-                     birthDate = user.birthDate
+                     userId = user.Id,
                  };
                  return response;
         }

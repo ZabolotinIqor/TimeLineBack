@@ -35,6 +35,25 @@ namespace WebApi.Controllers
             }
         }
         [HttpPost]
+        [Route("/register")]
+        public async Task<IActionResult> Register(RegistrationDto registrationDto)
+        {
+            if (!ModelState.IsValid) return BadRequest("Not correct data");
+            try
+            {
+                var result = await _authorizationService.Register(registrationDto);
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(403);
+            }
+        }
+        [HttpPost]
         [Route("/logout")]
         public async Task<IActionResult> Logout()
         { 

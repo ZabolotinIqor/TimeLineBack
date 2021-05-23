@@ -1,19 +1,9 @@
-﻿using Domain.Enums;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities
 {
-    public class ApplicationUser
+    public class ApplicationUser: IdentityUser
     {
-        public long id { get; set; }
-        public string login { get; set; }
-        public string email { get; set; }
-        public string name { get; set; }
-        public string surname { get; set; }
-        public string fathersName { get; set; }
-        public string avatarUrl { get; set; }
-        public string phone { get; set; }
-        public string birthDate { get; set; }
-        public Role role { get; set; }
-        public string password { get; set; }
+
     }
 }

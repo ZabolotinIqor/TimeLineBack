@@ -6,6 +6,7 @@ namespace Application.Authorization
     public interface IAuthorizationService
     {
         Task<LoginResponseDto> Login(LoginDto request);
+        Task<LoginResponseDto> Register(RegistrationDto registrationDto);
         Task Logout();
     }
 }

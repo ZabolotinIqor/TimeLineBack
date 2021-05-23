@@ -20,16 +20,16 @@ namespace Application.ApplicationUser
             return user;
         }
 
-        public async Task<Domain.Entities.ApplicationUser> GetById(long id)
+        public async Task<Domain.Entities.ApplicationUser> GetById(string id)
         {
-            var user = await context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.id == id);
+            var user = await context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.Id == id);
             return user;
         }
 
         public async Task<Domain.Entities.ApplicationUser> Get(LoginDto loginDto)
         {
             var user = new Domain.Entities.ApplicationUser();
-            user = await context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.login == loginDto.login);
+            user = await context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.Email == loginDto.email);
             return user;
         }
 
@@ -39,16 +39,16 @@ namespace Application.ApplicationUser
             return result;
         }
 
-        public async Task DeleteUserById(long id)
+        public async Task DeleteUserById(string id)
         {
-            var user = await context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.id == id);
+            var user = await context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.Id == id);
             context.ApplicationUsers.Remove(user);
             await context.SaveChangesAsync();
         }
 
         public async Task<Domain.Entities.ApplicationUser> Update(Domain.Entities.ApplicationUser user)
         {
-            var applicationUser = await context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.id == user.id);
+            var applicationUser = await context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.Id == user.Id);
             applicationUser = user;
             await context.SaveChangesAsync();
             return applicationUser;

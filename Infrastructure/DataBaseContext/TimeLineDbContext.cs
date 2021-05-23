@@ -1,10 +1,11 @@
 ﻿using System.Linq;
 using Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBaseContext
 {
-    public class TimeLineDbContext:DbContext
+    public class TimeLineDbContext:IdentityDbContext<ApplicationUser>
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
@@ -13,13 +14,13 @@ namespace Infrastructure.DataBaseContext
         public TimeLineDbContext(DbContextOptions<TimeLineDbContext> options) : base(options) { }
         public void InsertNew(RefreshToken token)
         {
-            var tokenModel = this.RefreshTokens.SingleOrDefault(i => i.UserId == token.UserId);
+            var tokenModel = RefreshTokens.SingleOrDefault(i => i.UserId == token.UserId);
             if (tokenModel != null)
             {
-                this.RefreshTokens.Remove(tokenModel);
+                RefreshTokens.Remove(tokenModel);
                 SaveChanges();
             }
-            this.RefreshTokens.Add(token);
+            RefreshTokens.Add(token);
             SaveChanges();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
