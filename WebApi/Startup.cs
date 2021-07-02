@@ -1,4 +1,6 @@
 using System.Text;
+using Application;
+using Application.ApplicationTask;
 using Application.ApplicationUser;
 using Application.Authorization;
 using Application.Token;
@@ -33,9 +35,8 @@ namespace WebApi
                 var sqlConnectionString = config.GetConnectionString("Default");
                 opt.UseNpgsql(sqlConnectionString, o => o.MigrationsAssembly("Infrastructure"));
             });
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IAuthorizationService, AuthorizationService>();
-            services.AddScoped<IApplicationUserService, ApplicationUserService>();
+            ServiceRegistration.AddServicesAssembly(services);
+            services.AddAutoMapper(typeof(Domain.Utils.AutoMapper));
             services.AddSwaggerGen();
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
