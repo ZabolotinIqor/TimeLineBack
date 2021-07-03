@@ -1,12 +1,9 @@
 using System.Text;
 using Application;
-using Application.ApplicationTask;
-using Application.ApplicationUser;
-using Application.Authorization;
-using Application.Token;
 using Domain.Entities;
 using Infrastructure.DataBaseContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 
 namespace WebApi
@@ -37,13 +35,56 @@ namespace WebApi
             });
             ServiceRegistration.AddServicesAssembly(services);
             services.AddAutoMapper(typeof(Domain.Utils.AutoMapper));
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(swagger =>  
+            {  
+                //This is to generate the Default UI of Swagger Documentation  
+                swagger.SwaggerDoc("v1", new OpenApiInfo  
+                {   
+                    Version= "v1",   
+                    Title = "JWT Token Authentication API",  
+                    Description="ASP.NET Core 3.1 Web API" });  
+                // To Enable authorization using Swagger (JWT)  
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()  
+                {  
+                    Name = "Authorization",  
+                    Type = SecuritySchemeType.ApiKey,  
+                    Scheme = "Bearer",  
+                    BearerFormat = "JWT",  
+                    In = ParameterLocation.Header,  
+                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",  
+                });  
+                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement  
+                {  
+                    {  
+                        new OpenApiSecurityScheme  
+                        {  
+                            Reference = new OpenApiReference  
+                            {  
+                                Type = ReferenceType.SecurityScheme,  
+                                Id = "Bearer"  
+                            }  
+                        },  
+                        new string[] {}  
+  
+                    }  
+                });  
+            });  
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
                 builder.AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowAnyOrigin();
             }));
+            services.AddAuthorization(options =>
+            {
+                var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
+                    JwtBearerDefaults.AuthenticationScheme);
+
+                defaultAuthorizationPolicyBuilder = 
+                    defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
+
+                options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
+            });
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
                 {
                     options.Password.RequireDigit = true;
@@ -54,7 +95,6 @@ namespace WebApi
                     options.User.RequireUniqueEmail = true;
                 })
                 .AddEntityFrameworkStores<TimeLineDbContext>();
-
             services.AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -87,8 +127,9 @@ namespace WebApi
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeLine v0.0.1");
             });
-
             app.UseRouting();
+            app.UseAuthorization();
+            app.UseAuthentication();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

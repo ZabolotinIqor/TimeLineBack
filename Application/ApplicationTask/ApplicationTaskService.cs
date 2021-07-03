@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Common.ApplicationTask;
 using Infrastructure.DataBaseContext;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.ApplicationTask
@@ -14,7 +16,9 @@ namespace Application.ApplicationTask
         private readonly TimeLineDbContext _context;
         private readonly IMapper _mapper;
 
-        public ApplicationTaskService(TimeLineDbContext context,IMapper mapper)
+        public ApplicationTaskService(TimeLineDbContext context,
+                                      IMapper mapper,  
+                                      UserManager<Domain.Entities.ApplicationUser> userManager)
         {
             _context = context;
             _mapper = mapper;
@@ -22,7 +26,6 @@ namespace Application.ApplicationTask
         public async Task<Domain.Entities.ApplicationTask> AddTask(CreateApplicationTask task,CancellationToken cts)
         {
             var mappedTask = _mapper.Map<Domain.Entities.ApplicationTask>(task);
-            mappedTask.CreatedDateTime = DateTime.Now;
             await _context.ApplicationTasks.AddAsync(mappedTask,cts);
             await _context.SaveChangesAsync(cts);
             return mappedTask;
@@ -49,7 +52,11 @@ namespace Application.ApplicationTask
         public async Task<Domain.Entities.ApplicationTask> UpdateTask(UpdateApplicationTask task)
         {
             var applicationTask = await _context.ApplicationTasks.FirstOrDefaultAsync(appTask => appTask.Id == task.Id);
-            applicationTask = _mapper.Map<Domain.Entities.ApplicationTask>(task);
+            applicationTask.Description = task.Description;
+            applicationTask.Name = task.Name;
+            applicationTask.StartDate = task.StartDate;
+            applicationTask.EndDate = task.EndDate;
+            applicationTask.UpdatedTime = DateTime.Now;
             await _context.SaveChangesAsync();
             return applicationTask;
         }

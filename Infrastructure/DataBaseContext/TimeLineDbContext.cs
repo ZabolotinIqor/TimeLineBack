@@ -27,6 +27,7 @@ namespace Infrastructure.DataBaseContext
         {
             modelBuilder.Entity<RefreshToken>()
                 .HasAlternateKey(c => c.UserId);
+            modelBuilder.Entity<ApplicationTask>((task) => task.HasKey(e => e.Id));
             modelBuilder.Entity<RefreshToken>()
                 .HasAlternateKey(c => c.Token);
             base.OnModelCreating(modelBuilder);

@@ -1,13 +1,14 @@
-﻿using System;
+﻿
 using System.Threading;
 using System.Threading.Tasks;
 using Application.ApplicationTask;
-using Domain.Common;
 using Domain.Common.ApplicationTask;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {
+    [Authorize]
     public class ApplicationTaskController: ApiBaseController
     {
         private readonly IApplicationTaskService _taskService;

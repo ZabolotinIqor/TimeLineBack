@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Domain.Common.ApplicationTask;
 using Domain.Entities;
 
@@ -10,8 +11,8 @@ namespace Domain.Utils
         public AutoMapper()
         {
             CreateMap<ApplicationTask, CreateApplicationTask>();
-            CreateMap<CreateApplicationTask, ApplicationTask>();
-            CreateMap<UpdateApplicationTask, ApplicationTask>();
+            CreateMap<CreateApplicationTask, ApplicationTask>()
+                .BeforeMap((updateTask,applicationTask)=>applicationTask.CreatedDateTime = DateTime.Now);
         }
     }
 }
