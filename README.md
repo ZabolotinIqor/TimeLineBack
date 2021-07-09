@@ -2,18 +2,14 @@
 
 ## About / Time Line
 
-* What is it, what does it do / Abstract
 * Project status: working/prototype
-* Nuxeo Support
 
 ## Table of contents
 
 > * [Time Line Application Backend](#time-line-application-backend)
->   * [About / Time Line](#about--time-line)
->   * [Table of contents](#table-of-contents)
+>   * [About](#about--time-line)
 >   * [Installation](#installation)
 >   * [Usage](#usage)
->     * [Screenshots](#screenshots)
 >     * [Features](#features)
 >   * [Resources (Documentation and other links)](#resources-documentation-and-other-links)
 >   * [Contributing / Reporting issues](#contributing--reporting-issues)
@@ -21,10 +17,6 @@
 >   * [License](#license)
 
 ## Installation
-
-## Usage
-
-### Screenshots
 
 ### Features
 

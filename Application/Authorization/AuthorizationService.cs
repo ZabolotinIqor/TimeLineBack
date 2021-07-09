@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Application.ApplicationUser;
 using Application.Token;
 using Domain.Common;
@@ -26,17 +27,21 @@ namespace Application.Authorization
         
         public async Task<LoginResponseDto> Login(LoginDto request)
         {
-   
-            var result = await _signInManager.PasswordSignInAsync(request.email, request.password, false, false);
-
-
-            if (result.Succeeded)
+            var user = await _userManager.FindByEmailAsync(request.email);
+            if (!(user is null))
             {
-                var _user = await _userManager.FindByNameAsync(request.email);
-                await _signInManager.SignInAsync(_user, false);
-                return _tokenService.Execute(_user);
-            }
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, request.password, false, false);
 
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, false);
+                    return _tokenService.Execute(user);
+                }
+            }
+            else
+            {
+                throw new Exception("There is no such user by this email");
+            }
             return null;
         }
         public async Task<LoginResponseDto> Register(RegistrationDto registrationDto)

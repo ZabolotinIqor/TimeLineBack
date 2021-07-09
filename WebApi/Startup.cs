@@ -1,11 +1,13 @@
 using System.Text;
 using Application;
+using Application.ApplicationUser;
 using Domain.Entities;
 using Infrastructure.DataBaseContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -33,17 +35,17 @@ namespace WebApi
                 var sqlConnectionString = config.GetConnectionString("Default");
                 opt.UseNpgsql(sqlConnectionString, o => o.MigrationsAssembly("Infrastructure"));
             });
-            ServiceRegistration.AddServicesAssembly(services);
+            services.AddServicesAssembly();
             services.AddAutoMapper(typeof(Domain.Utils.AutoMapper));
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IUserResolverService, UserResolverService>();
             services.AddSwaggerGen(swagger =>  
-            {  
-                //This is to generate the Default UI of Swagger Documentation  
+            {
                 swagger.SwaggerDoc("v1", new OpenApiInfo  
                 {   
                     Version= "v1",   
                     Title = "JWT Token Authentication API",  
-                    Description="ASP.NET Core 3.1 Web API" });  
-                // To Enable authorization using Swagger (JWT)  
+                    Description="ASP.NET Core 3.1 Web API" });
                 swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()  
                 {  
                     Name = "Authorization",  
