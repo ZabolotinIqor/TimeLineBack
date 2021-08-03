@@ -1,6 +1,7 @@
 ﻿using System;
 using AutoMapper;
 using Domain.Common.ApplicationTask;
+using Domain.Common.ApplicationUser;
 using Domain.Entities;
 
 namespace Domain.Utils
@@ -13,6 +14,8 @@ namespace Domain.Utils
             CreateMap<ApplicationTask, CreateApplicationTask>();
             CreateMap<CreateApplicationTask, ApplicationTask>()
                 .BeforeMap((updateTask,applicationTask)=>applicationTask.CreatedDateTime = DateTime.Now);
+            CreateMap<ApplicationUser, UserDto>();
+            CreateMap<UserDto, ApplicationUser>();
         }
     }
 }

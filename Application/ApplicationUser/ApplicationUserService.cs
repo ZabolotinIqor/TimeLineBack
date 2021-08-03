@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using Domain.Common;
+using Domain.Common.ApplicationUser;
 using Infrastructure.DataBaseContext;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,9 +11,12 @@ namespace Application.ApplicationUser
     public class ApplicationUserService: IApplicationUserService
     {
         private readonly TimeLineDbContext _context;
-        public ApplicationUserService(TimeLineDbContext context)
+        private readonly IMapper _mapper;
+        public ApplicationUserService(TimeLineDbContext context,
+                                      IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public async Task<Domain.Entities.ApplicationUser> Add(Domain.Entities.ApplicationUser user)
         {
@@ -26,11 +31,11 @@ namespace Application.ApplicationUser
             return user;
         }
 
-        public async Task<Domain.Entities.ApplicationUser> Get(LoginDto loginDto)
+        public async Task<UserDto> Get(LoginDto loginDto)
         {
             var user = new Domain.Entities.ApplicationUser();
             user = await _context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.Email == loginDto.email);
-            return user;
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task<IEnumerable<Domain.Entities.ApplicationUser>> GetAll()
@@ -46,12 +51,12 @@ namespace Application.ApplicationUser
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Domain.Entities.ApplicationUser> Update(Domain.Entities.ApplicationUser user)
+        public async Task<UserDto> Update(UserDto user)
         {
             var applicationUser = await _context.ApplicationUsers.FirstOrDefaultAsync(appUser => appUser.Id == user.Id);
-            applicationUser = user;
+            applicationUser = _mapper.Map<Domain.Entities.ApplicationUser>(user);
             await _context.SaveChangesAsync();
-            return applicationUser;
+            return user;
         }
     }
 }

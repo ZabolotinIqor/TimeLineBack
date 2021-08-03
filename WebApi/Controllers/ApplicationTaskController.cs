@@ -66,6 +66,17 @@ namespace WebApi.Controllers
             }
             return Ok(result);
         }
+        [HttpGet]
+        [Route("/getAllUsersTasksForToday")]
+        public async Task<IActionResult> GetAllUsersTasksForToday()
+        {
+            var result = await _taskService.GetAllTaskForToday();
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
         [HttpPut]
         [Route("/updateUsersTask")]
         public async Task<IActionResult> UpdateUsersTask(UpdateApplicationTask task)

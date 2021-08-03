@@ -16,6 +16,7 @@ namespace Application.ApplicationTask
         private readonly TimeLineDbContext _context;
         private readonly IMapper _mapper;
         private readonly IUserResolverService _userResolver;
+        private readonly Task<Domain.Entities.ApplicationUser> _currentUser;
 
         public ApplicationTaskService(TimeLineDbContext context,
                                       IMapper mapper,
@@ -25,11 +26,12 @@ namespace Application.ApplicationTask
             _context = context;
             _mapper = mapper;
             _userResolver = userResolver;
+            _currentUser =  _userResolver.GetUser();
         }
         public async Task<Domain.Entities.ApplicationTask> AddTask(CreateApplicationTask task, CancellationToken cts)
         {
             var mappedTask = _mapper.Map<Domain.Entities.ApplicationTask>(task);
-            mappedTask.applicationUser = await _userResolver.GetUser();
+            mappedTask.applicationUser = await _currentUser;
             await _context.ApplicationTasks.AddAsync(mappedTask,cts);
             await _context.SaveChangesAsync(cts);
             return mappedTask;
@@ -38,7 +40,7 @@ namespace Application.ApplicationTask
         public async Task<IEnumerable<Domain.Entities.ApplicationTask>> AddMultiplyTasks(IEnumerable<CreateApplicationTask> task, CancellationToken cts)
         {
             var mappedTask = _mapper.Map<List<Domain.Entities.ApplicationTask>>(task);
-            var currentUser = await _userResolver.GetUser();
+            var currentUser = await _currentUser;
             foreach (var applicationTask in mappedTask)
             {
                 applicationTask.applicationUser = currentUser;
@@ -50,8 +52,8 @@ namespace Application.ApplicationTask
         }
         public async Task<Domain.Entities.ApplicationTask> GetTaskById(long id)
         {
-            var currentUser = await _userResolver.GetUser();
-             var task = await _context.ApplicationTasks
+            var currentUser = await _currentUser;
+            var task = await _context.ApplicationTasks
                  .FirstOrDefaultAsync(appTask => appTask.Id == id 
                                                  && appTask.applicationUser == currentUser);
              return task;
@@ -59,13 +61,19 @@ namespace Application.ApplicationTask
 
         public async Task<IEnumerable<Domain.Entities.ApplicationTask>> GetAllTasks()
         {
-            var currentUser = await _userResolver.GetUser();
+            var currentUser = await _currentUser;
             return _context.ApplicationTasks.Where(task => task.applicationUser == currentUser);
+        }
+
+        public async  Task<IEnumerable<Domain.Entities.ApplicationTask>> GetAllTaskForToday()
+        {
+            var tasks = await GetAllTasks();
+            return  tasks.Where(task => task.StartDate.Day == DateTime.Today.Day);
         }
 
         public async Task DeleteTaskById(long id)
         {
-            var currentUser = await _userResolver.GetUser();
+            var currentUser = await _currentUser;
             var task = await _context.ApplicationTasks
                 .FirstOrDefaultAsync(appTask => appTask.Id == id && appTask.applicationUser == currentUser);
             if (task !=  null)
@@ -77,7 +85,7 @@ namespace Application.ApplicationTask
 
         public async Task<Domain.Entities.ApplicationTask> UpdateTask(UpdateApplicationTask task)
         {
-            var currentUser = await _userResolver.GetUser();
+            var currentUser = await _currentUser;
             var applicationTask = await _context.ApplicationTasks
                 .FirstOrDefaultAsync(appTask => appTask.Id == task.Id 
                                                 && appTask.applicationUser == currentUser);

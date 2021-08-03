@@ -14,7 +14,7 @@ namespace Application.ApplicationUser
             _userManager = userManager;
         }
 
-        public async  Task<Domain.Entities.ApplicationUser> GetUser() {
+        public async Task<Domain.Entities.ApplicationUser> GetUser() {
             var username = _accessor.HttpContext.User;
             var user = await _userManager.GetUserAsync(username);
             return  user;
