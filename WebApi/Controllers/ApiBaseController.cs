@@ -5,9 +5,7 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Produces("application/json")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(StatusCodes.Status502BadGateway)]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     [Route("api/[controller]")]
     public class ApiBaseController: ControllerBase
     {

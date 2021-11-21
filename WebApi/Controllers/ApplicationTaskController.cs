@@ -14,19 +14,17 @@ namespace WebApi.Controllers
     public class ApplicationTaskController: ApiBaseController
     {
         private readonly IApplicationTaskService _taskService;
-        private readonly UserManager<Domain.Entities.ApplicationUser> _userManager;
 
         public ApplicationTaskController(IApplicationTaskService taskService,
                             UserManager<Domain.Entities.ApplicationUser> userManager)
         {
             _taskService = taskService;
-            _userManager = userManager;
         }
         [HttpGet]
-        [Route("/getUsersTask")]
-        public async Task<IActionResult> GetUsersTask(long id)
+        [Route("/task/{taskId}")]
+        public async Task<IActionResult> GetTaskByUserId(long taskId)
         {
-            var result = await _taskService.GetTaskById(id);
+            var result = await _taskService.GetTaskById(taskId);
             if (result == null)
             {
                 return NotFound();
@@ -34,7 +32,7 @@ namespace WebApi.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("/addTask")]
+        [Route("/task")]
         public async Task<IActionResult> AddTask(CreateApplicationTask task,CancellationToken cts)
         {
             var result = await _taskService.AddTask(task,cts);
@@ -45,8 +43,8 @@ namespace WebApi.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("/addMultiplyTasks")]
-        public async Task<IActionResult> AddMultiplyTasks(IEnumerable<CreateApplicationTask> tasks,CancellationToken cts)
+        [Route("/tasks")]
+        public async Task<IActionResult> AddTasks(IEnumerable<CreateApplicationTask> tasks,CancellationToken cts)
         {
             var result = await _taskService.AddMultiplyTasks(tasks,cts);
             if (result == null)
@@ -56,8 +54,8 @@ namespace WebApi.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("/getAllUsersTasks")]
-        public async Task<IActionResult> GetAllUsersTasks()
+        [Route("/tasks")]
+        public async Task<IActionResult> GetTasks()
         {
             var result = await _taskService.GetAllTasks();
             if (result == null)
@@ -67,8 +65,8 @@ namespace WebApi.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("/getAllUsersTasksForToday")]
-        public async Task<IActionResult> GetAllUsersTasksForToday()
+        [Route("/today-tasks")]
+        public async Task<IActionResult> GetTasksForToday()
         {
             var result = await _taskService.GetAllTaskForToday();
             if (result == null)
@@ -78,8 +76,8 @@ namespace WebApi.Controllers
             return Ok(result);
         }
         [HttpPut]
-        [Route("/updateUsersTask")]
-        public async Task<IActionResult> UpdateUsersTask(UpdateApplicationTask task)
+        [Route("/task")]
+        public async Task<IActionResult> UpdateTask(UpdateApplicationTask task)
         {
             var result = await _taskService.UpdateTask(task);
             if (result == null)
@@ -90,10 +88,10 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        [Route("/deleteUsersTask")]
-        public async Task<IActionResult> DeleteUsersTask(long id)
+        [Route("/task/{taskId}")]
+        public async Task<IActionResult> DeleteUsersTask(long taskId)
         {
-            await _taskService.DeleteTaskById(id);
+            await _taskService.DeleteTaskById(taskId);
             return Ok();
         } 
 

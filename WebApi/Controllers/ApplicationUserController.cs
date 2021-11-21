@@ -14,10 +14,10 @@ namespace WebApi.Controllers
         }
         
         [HttpGet]
-        [Route("/getUser")]
-        public async Task<IActionResult> GetUser(string id)
+        [Route("/user/{userId}")]
+        public async Task<IActionResult> GetUser(string userId)
         {
-            var result = await _userService.GetById(id);
+            var result = await _userService.GetById(userId);
             if (result == null)
             {
                 return NotFound();
@@ -25,7 +25,7 @@ namespace WebApi.Controllers
             return Ok(result);
         }
         [HttpPut]
-        [Route("/updateUser")]
+        [Route("/user")]
         public async Task<IActionResult> UpdateUser(UserDto user)
         {
             var result = await _userService.Update(user);
